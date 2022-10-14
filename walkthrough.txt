@@ -1,0 +1,99 @@
+$ yarn add --dev hardhat
+$ yarn hardhat
+*choose new js project*
+copy to this directory from last project: .env, .prettierrc, .prettierignore
+$ yarn add --dev solhint && yarn solhint --init
+$ yarn add --dev hardhat-deploy prettier dotenv
+add require("hardhat-deploy") to hardhat.config.js
+delete deploy.js
+mkdir deploy
+$ yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers
+write deploy/01-deploy-fund-me.js
+add namedAccounts: to hardhat config
+(goal: parameterize the code so that we don't need to hardcode/ assume one network)
+create helper-hardhat-config > create networkConfig > export module
+import it in 01-deploy
+create contracts/test/MockV3Aggregator.sol
+import the chainlink official mock contract in that file
+add another solidity version to hh config
+$ yarn add --dev @chainlink/contracts
+$ yarn hardhat compile
+in helper create developmentChains > export
+import in deploy-mocks
+write deploy code in 00-deploy-mocks
+(reference the chainlink contract for the args)
+(they are in the constructor)
+can we use only the deploy-mocks script?
+at the bottom add module.exports.tags
+write the deploy code in 01-deploy-fund-me
+add tags
+create utils/verify.js
+copy verify code from last project
+import to 01-deploy
+add blockConfirmations to the goerli: part of hh config
+add waitConfirmations to 01-deploy
+clean up solidity style
+
+Order of Layout:
+-Pragma statements
+-Import statements
+-Interfaces
+-Libraries
+-Contracts
+
+Inside each contract, library or interface, use the following order:
+-Type declarations
+-State variables
+-Events
+-Functions
+
+order of functions:
+-constructor
+-receive
+-fallback
+-external
+-public
+-internal
+-private
+-view / pure
+
+add NatSpec commenting (this can be used to automatically generate documentation)
+unit tests are done locally
+-local hh
+-forked hh
+staging tests can be done on a testnet (last stop!)
+
+start writing unit test test/unit/FundMe.test.js
+write beforeEach > deploy using `fixture` which lets us use our tags
+
+how to write a test for "errors if didn't send enough ETH"?
+if we make the contract error, it will break our test script
+expect(...).to.be.revertedWith("Exact error")
+finish writing unit tests for all of FundMe
+
+gas optimization:
+reading from/ writing to storage uses a ton of gas
+sidequest > FunWithStorage.sol/ 99-deploy-storage-fun.js
+
+the bytecode of a conctract is a string representing all
+the opcodes. opcodes determine how much computation (gas)
+the contract requires. see list of gas cost for each opcode
+at https://github.com/crytic/evm-opcodes
+
+rewrite withdraw() as cheaperWithdraw()
+
+change public variables to private where possible
+and write getter functions for them
+
+change all requires to reverts so that the custom
+error string doesn't get stored onchain
+
+staging tests:
+this is to check how your contract behaves after deploying
+to a testnet. the last step before deploying to mainnet
+
+new scripts: fund.js, withdraw.js
+now we have an easy way to interact with the contract while
+(for ex) testing it on the localhost network
+
+adding scripts: to package.json
