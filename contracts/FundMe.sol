@@ -45,7 +45,9 @@ contract FundMe {
     }
 
     fallback() external payable {
-        fund();
+        if (msg.value > 0) {
+            fund();
+        }
     }
 
     /** NatSpec example
